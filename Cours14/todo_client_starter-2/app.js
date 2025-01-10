@@ -155,15 +155,15 @@ logoutBtn.addEventListener("click", (e) => {
   displayMessage("Vous avez été déconnecté.");
 });
 
-// affiche les todos:
+// récupère les todos:
 
 const todos = async () => {
   const options = {
     method: "GET",
     headers: {
       "content-type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`
     },
-    authorization: `Bearer ${localStorage.getItem("authToken")}`,
   };
 
   const todoResponse = await fetch(
@@ -171,17 +171,46 @@ const todos = async () => {
     options
   );
   const resultTodo = await todoResponse.json();
-  displayMessage(resultTodo);
+
+  displayTodos(resultTodo.todos);
+
+  return resultTodo
 };
 
+// affiche les todos
 
 const displayTodos = (todos) => {
+  // Affiche la liste des tâches (todos).
+  const container = document.querySelector("main > ul"); // Sélectionne le conteneur des tâches.
+  container.innerHTML = ""; // Efface le contenu actuel du conteneur.
 
-  
-}
+  todos.forEach((todo) => {
+    // Pour chaque tâche dans la liste...
+    const todoItem = document.createElement("li"); // Crée un élément de liste pour la tâche.
+    todoItem.id = todo.id; // Attribue l'ID de la tâche à l'élément.
 
+    const bodyParagraph = document.createElement("p"); // Crée un paragraphe pour le corps de la tâche.
+    bodyParagraph.classList.add("body"); // Ajoute la classe 'body'.
+    bodyParagraph.textContent = todo.body; // Ajoute le corps de la tâche au paragraphe.
 
+    const tagsParagraph = document.createElement("p"); // Crée un paragraphe pour les tags.
+    tagsParagraph.classList.add("tags"); // Ajoute la classe 'tags'.
+    tagsParagraph.textContent = todo.tags; // Ajoute les tags au paragraphe.
 
+    const deleteButton = document.createElement("div"); // Crée un bouton de suppression.
+    deleteButton.classList.add("delete"); // Ajoute la classe 'delete'.
+
+    // Ajoute les éléments créés à l'élément de la tâche.
+    todoItem.appendChild(bodyParagraph);
+    todoItem.appendChild(tagsParagraph);
+    todoItem.appendChild(deleteButton);
+
+    // Ajoute l'élément de la tâche au conteneur.
+    container.appendChild(todoItem);
+  });
+};
+
+todos()
 
 // Initialisation de la page
 const pageLoad = () => {
